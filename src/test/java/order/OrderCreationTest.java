@@ -74,12 +74,12 @@ public class OrderCreationTest {
     }
 
     @Test
-    @DisplayName("Невозможно создать заказ без ингридиентами и без авторизации")
+    @DisplayName("Невозможно создать заказ без ингридиентов и без авторизации")
     @Description("Проверка невозможности создания нового заказа без ингредиентов и без передаче токена авторизации")
     public void checkOrderCreateWithoutAuthAndWithoutIngredients() {
         order = Order.withoutIngredients();
         boolean isOk = orderClient.createWithoutAuth(order)
-                .statusCode(401)
+                .statusCode(400)
                 .extract()
                 .path("success");
         assertFalse(isOk);

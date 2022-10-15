@@ -20,7 +20,7 @@ public class UserCredentials {
     }
 
     public static UserCredentials withoutIncorrectLoginFrom(User user) {
-        return new UserCredentials(user.getEmail(), user.getPassword(), user.getName() + "123");
+        return new UserCredentials("asd" + user.getEmail(), user.getPassword(), user.getName());
     }
 
     public static UserCredentials withoutIncorrectPasswordFrom(User user) {
