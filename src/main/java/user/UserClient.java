@@ -1,5 +1,6 @@
 package user;
 
+import io.qameta.allure.Step;
 import io.restassured.response.ValidatableResponse;
 
 public class UserClient extends BaseClient{
@@ -10,7 +11,8 @@ public class UserClient extends BaseClient{
     private final String USER = ROOT + "user";
     private String userToken;
 
-    public ValidatableResponse create(User user) {
+    @Step("Запрос на создание нового пользователя (POST на /api/auth/register)")
+    public ValidatableResponse createUser(User user) {
         return getSpec()
                 .body(user)
                 .when()
@@ -18,6 +20,7 @@ public class UserClient extends BaseClient{
                 .then().log().all();
     }
 
+    @Step("Запрос на авторизацию пользователя (POST на /api/auth/login)")
     public ValidatableResponse login(UserCredentials creds) {
         return getSpec()
                 .body(creds)
@@ -26,20 +29,23 @@ public class UserClient extends BaseClient{
                 .then().log().all();
     }
 
+    @Step("Запрос на получение accessToken зарегистрированного пользователя")
     public String getToken(UserCredentials creds){
         return login(creds)
                 .extract()
                 .path("accessToken");
     }
 
-    public void delete(String userToken) {
+    @Step("Запрос на удаление зарегистрированного пользователя (DELETE на /api/auth/user)")
+    public void deleteUser(String userToken) {
         getSpecWithAuth(userToken)
                 .when()
                 .delete(USER)
                 .then().log().all();
     }
 
-    public ValidatableResponse change(String userToken, UserCredentials creds) {
+    @Step("Запрос с передачей токена авторизации на изменение данных зарегистрированного пользователя (PATCH на /api/auth/user)")
+    public ValidatableResponse changeUser(String userToken, UserCredentials creds) {
         return getSpecWithAuth(userToken)
                 .body(creds)
                 .when()
@@ -47,7 +53,8 @@ public class UserClient extends BaseClient{
                 .then().log().all();
     }
 
-    public ValidatableResponse changeWithoutToken(UserCredentials creds) {
+    @Step("Запрос без передачи токена авторизации на изменение данных зарегистрированного пользователя (PATCH на /api/auth/user)")
+    public ValidatableResponse changeUserWithoutToken(UserCredentials creds) {
         return getSpec()
                 .body(creds)
                 .when()
@@ -55,8 +62,9 @@ public class UserClient extends BaseClient{
                 .then().log().all();
     }
 
+    @Step("Удаление созданного пользователя")
     public void tearDown(UserCredentials creds) {
         userToken = getToken(creds);
-        delete(userToken);
+        deleteUser(userToken);
     }
 }

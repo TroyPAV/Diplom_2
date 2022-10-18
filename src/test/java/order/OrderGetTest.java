@@ -8,6 +8,7 @@ import org.junit.Test;
 import user.User;
 import user.UserClient;
 import user.UserCredentials;
+import static org.apache.http.HttpStatus.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -25,25 +26,25 @@ public class OrderGetTest {
     public void setUp() {
         user = User.getUser();
         userClient = new UserClient();
-        userClient.create(user);
+        userClient.createUser(user);
         creds = UserCredentials.from(user);
         userToken = userClient.getToken(creds);
         orderClient = new OrderClient();
         order = Order.getIngredients();
-        orderClient.createWithAuth(userToken, order);
+        orderClient.createOrderWithAuth(userToken, order);
     }
 
     @After
     public void tearDown() {
-        userClient.delete(userToken);
+        userClient.deleteUser(userToken);
     }
 
     @Test
     @DisplayName("Можно получить заказы авторизованниго пользователя")
     @Description("Проверка получения заказов конкретного пользователя при передаче токена авторизации")
-    public void test1() {
+    public void getOrderAuthorizedUser() {
         boolean isOk = orderClient.getOrderWithAuth(userToken)
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .extract()
                 .path("success");
         assertTrue(isOk);
@@ -52,9 +53,9 @@ public class OrderGetTest {
     @Test
     @DisplayName("Невозможно получить заказы неавторизованого пользователя")
     @Description("Проверка невозможности получения заказов пользователя, если не передовать токен авторизации")
-    public void test2() {
+    public void getOrderUnauthorizedUser() {
         boolean isOk = orderClient.getOrderWithoutAuth()
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract()
                 .path("success");
         assertFalse(isOk);

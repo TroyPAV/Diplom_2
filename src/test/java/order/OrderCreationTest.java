@@ -8,6 +8,7 @@ import org.junit.Test;
 import user.User;
 import user.UserClient;
 import user.UserCredentials;
+import static org.apache.http.HttpStatus.*;
 
 
 import static org.junit.Assert.assertFalse;
@@ -26,7 +27,7 @@ public class OrderCreationTest {
     public void setUp() {
         user = User.getUser();
         userClient = new UserClient();
-        userClient.create(user);
+        userClient.createUser(user);
         creds = UserCredentials.from(user);
         userToken = userClient.getToken(creds);
         orderClient = new OrderClient();
@@ -34,7 +35,7 @@ public class OrderCreationTest {
 
     @After
     public void tearDown() {
-        userClient.delete(userToken);
+        userClient.deleteUser(userToken);
     }
 
     @Test
@@ -42,8 +43,8 @@ public class OrderCreationTest {
     @Description("Проверка создания нового заказа при передаче токена и валидных хешей ингредиентов")
     public void checkOrderCreateWithAuthAndIngredients() {
         order = Order.getIngredients();
-        boolean isOk = orderClient.createWithAuth(userToken, order)
-                .statusCode(200)
+        boolean isOk = orderClient.createOrderWithAuth(userToken, order)
+                .statusCode(SC_OK)
                 .extract()
                 .path("success");
         assertTrue(isOk);
@@ -54,8 +55,8 @@ public class OrderCreationTest {
     @Description("Проверка невозможности создания нового заказа при передаче токена без ингредиентов")
     public void checkOrderCreateWithAuthAndWithoutIngredients() {
         order = Order.withoutIngredients();
-        boolean isOk = orderClient.createWithAuth(userToken, order)
-                .statusCode(400)
+        boolean isOk = orderClient.createOrderWithAuth(userToken, order)
+                .statusCode(SC_BAD_REQUEST)
                 .extract()
                 .path("success");
         assertFalse(isOk);
@@ -66,8 +67,8 @@ public class OrderCreationTest {
     @Description("Проверка невозможности создания нового заказа при передаче валидных хешей ингредиентов без авторизации")
     public void checkOrderCreateWithoutAuthAndWithIngredients() {
         order = Order.getIngredients();
-        boolean isOk = orderClient.createWithoutAuth(order)
-                .statusCode(401)
+        boolean isOk = orderClient.createOrderWithoutAuth(order)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract()
                 .path("success");
         assertFalse(isOk);
@@ -78,8 +79,8 @@ public class OrderCreationTest {
     @Description("Проверка невозможности создания нового заказа без ингредиентов и без передаче токена авторизации")
     public void checkOrderCreateWithoutAuthAndWithoutIngredients() {
         order = Order.withoutIngredients();
-        boolean isOk = orderClient.createWithoutAuth(order)
-                .statusCode(400)
+        boolean isOk = orderClient.createOrderWithoutAuth(order)
+                .statusCode(SC_BAD_REQUEST)
                 .extract()
                 .path("success");
         assertFalse(isOk);
@@ -90,7 +91,7 @@ public class OrderCreationTest {
     @Description("Проверка возвращения 500 Internal Server Error при передаче в теле запроса невалидных хешей ингридиентов.")
     public void checkInvalidHashIngredients() {
         order = Order.getIncorrectIngredients();
-        orderClient.createWithAuth(userToken, order)
-                .statusCode(500);
+        orderClient.createOrderWithAuth(userToken, order)
+                .statusCode(SC_INTERNAL_SERVER_ERROR);
     }
 }

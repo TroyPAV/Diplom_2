@@ -5,6 +5,7 @@ import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.apache.http.HttpStatus.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,14 +21,14 @@ public class UserChangeTest {
     public void setUp() {
         user = User.getUser();
         userClient = new UserClient();
-        userClient.create(user);
+        userClient.createUser(user);
         creds = UserCredentials.from(user);
         userToken = userClient.getToken(creds);
     }
 
     @After
     public void tearDown() {
-        userClient.delete(userToken);
+        userClient.deleteUser(userToken);
     }
 
     @Test
@@ -35,8 +36,8 @@ public class UserChangeTest {
     @Description("Проверка измениения поля email авторизованного пользователя при передаче токена и нового email в теле запроса.")
     public void checkChangeUserEmailWithAuth() {
         UserCredentials newCreds = UserCredentials.changedEmailFrom(user);
-        boolean isOk = userClient.change(userToken, newCreds)
-                .statusCode(200)
+        boolean isOk = userClient.changeUser(userToken, newCreds)
+                .statusCode(SC_OK)
                 .extract().path("success");
         assertTrue(isOk);
     }
@@ -46,8 +47,8 @@ public class UserChangeTest {
     @Description("Проверка измениения поля name авторизованного пользователя при передаче токена и нового name в теле запроса.")
     public void checkChangeUserNameWithAuth() {
         UserCredentials newCreds = UserCredentials.changedNameFrom(user);
-        boolean isOk = userClient.change(userToken, newCreds)
-                .statusCode(200)
+        boolean isOk = userClient.changeUser(userToken, newCreds)
+                .statusCode(SC_OK)
                 .extract().path("success");
         assertTrue(isOk);
     }
@@ -57,8 +58,8 @@ public class UserChangeTest {
     @Description("Проверка возвращения message с сообщением об ошибке в теле ответа при запросе на изменение email без авторизвции.")
     public void checkChangeUserEmailWithoutAuth() {
         UserCredentials newCreds = UserCredentials.changedEmailFrom(user);
-        String message = userClient.changeWithoutToken(newCreds)
-                .statusCode(401)
+        String message = userClient.changeUserWithoutToken(newCreds)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract().path("message");
         assertEquals("You should be authorised", message);
     }
@@ -68,8 +69,8 @@ public class UserChangeTest {
     @Description("Проверка возвращения message с сообщением об ошибке в теле ответа при запросе на изменение name без авторизвции.")
     public void checkChangeUserNameWithoutAuth() {
         UserCredentials newCreds = UserCredentials.changedNameFrom(user);
-        String message = userClient.changeWithoutToken(newCreds)
-                .statusCode(401)
+        String message = userClient.changeUserWithoutToken(newCreds)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract().path("message");
         assertEquals("You should be authorised", message);
     }

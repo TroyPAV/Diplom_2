@@ -5,6 +5,7 @@ import io.qameta.allure.junit4.DisplayName;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.apache.http.HttpStatus.*;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -19,7 +20,7 @@ public class UserAuthorizationTest {
     public void setUp() {
         user = User.getUser();
         userClient = new UserClient();
-        userClient.create(user);
+        userClient.createUser(user);
         creds = UserCredentials.from(user);
     }
 
@@ -33,7 +34,7 @@ public class UserAuthorizationTest {
     @Description("Проверка успешного логина пользователя при передаче в теле запроса существующих значений: email, password, name")
     public void userCorrectAuthorization() {
         boolean isOk = userClient.login(creds)
-                .statusCode(200)
+                .statusCode(SC_OK)
                 .extract()
                 .path("success");
         assertTrue(isOk);
@@ -45,7 +46,7 @@ public class UserAuthorizationTest {
     public void userAuthWithIncorrectLogin() {
         UserCredentials newCreds = UserCredentials.withoutIncorrectLoginFrom(user);
         boolean isOk = userClient.login(newCreds)
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract()
                 .path("success");
         assertFalse(isOk);
@@ -57,7 +58,7 @@ public class UserAuthorizationTest {
     public void userAuthWithIncorrectPassword() {
         UserCredentials newCreds = UserCredentials.withoutIncorrectPasswordFrom(user);
         boolean isOk = userClient.login(newCreds)
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .extract()
                 .path("success");
         assertFalse(isOk);
