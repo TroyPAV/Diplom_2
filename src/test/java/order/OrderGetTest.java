@@ -30,7 +30,7 @@ public class OrderGetTest {
         creds = UserCredentials.from(user);
         userToken = userClient.getToken(creds);
         orderClient = new OrderClient();
-        order = Order.getIngredients();
+        order = Order.getIngredientsList();
         orderClient.createOrderWithAuth(userToken, order);
     }
 

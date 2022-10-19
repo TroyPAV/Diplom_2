@@ -14,7 +14,7 @@ public class Order {
         this.ingredients = ingredients;
     }
 
-    public static Order getIngredients() {
+    public static Order getIngredientsList() {
         return new Order(List.of("61c0c5a71d1f82001bdaaa79","61c0c5a71d1f82001bdaaa6c"));
     }
 

@@ -42,7 +42,7 @@ public class OrderCreationTest {
     @DisplayName("Можно создать заказ с ингридиентами при успешной авторизации")
     @Description("Проверка создания нового заказа при передаче токена и валидных хешей ингредиентов")
     public void checkOrderCreateWithAuthAndIngredients() {
-        order = Order.getIngredients();
+        order = Order.getIngredientsList();
         boolean isOk = orderClient.createOrderWithAuth(userToken, order)
                 .statusCode(SC_OK)
                 .extract()
@@ -66,7 +66,7 @@ public class OrderCreationTest {
     @DisplayName("Невозможно создать заказ с ингридиентами без авторизации")
     @Description("Проверка невозможности создания нового заказа при передаче валидных хешей ингредиентов без авторизации")
     public void checkOrderCreateWithoutAuthAndWithIngredients() {
-        order = Order.getIngredients();
+        order = Order.getIngredientsList();
         boolean isOk = orderClient.createOrderWithoutAuth(order)
                 .statusCode(SC_UNAUTHORIZED)
                 .extract()
