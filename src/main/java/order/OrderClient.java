@@ -8,7 +8,7 @@ public class OrderClient extends BaseClient {
 
     private final String ORDER = "orders";
 
-    //@Step("Запрос на создание заказа с передачей токена авторизации зарегистрированного пользователя (POST на /api/orders)")
+    @Step("Запрос на создание заказа с передачей токена авторизации зарегистрированного пользователя (POST на /api/orders)")
     public ValidatableResponse createOrderWithAuth(String userToken, Order order) {
         return getSpecWithAuth(userToken)
                 .body(order)
@@ -17,7 +17,7 @@ public class OrderClient extends BaseClient {
                 .then().log().all();
     }
 
-    //@Step("Запрос на создание заказа без передачи токена авторизации зарегистрированного пользователя POST на /api/orders")
+    @Step("Запрос на создание заказа без передачи токена авторизации зарегистрированного пользователя POST на /api/orders")
     public ValidatableResponse createOrderWithoutAuth(Order order) {
         return getSpec()
                 .body(order)
